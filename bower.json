@@ -1,0 +1,28 @@
+{
+  "name": "app",
+  "version": "0.0.0",
+  "authors": [
+    "pdoh00 <pdoh00@gmail.com>"
+  ],
+  "license": "MIT",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "scripts/vendor",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "requirejs": "latest",
+    "jquery": "latest",
+    "backbone-amd": "latest",
+    "underscore-amd": "latest",
+    "bootstrap": "latest",
+    "fontawesome": "latest",
+    "backbone": "latest",
+    "rxjs": "latest",
+    "mustache": "*",
+    "marionette": "latest"
+  }
+}

@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+<html>
+<head lang="en">
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Time2Brew</title>
+
+    <!--<script src="js/vendor/fallback/fallback.min.js"></script>-->
+
+    <link href="main.css" rel="stylesheet">
+    <link href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css" rel="stylesheet">
+    <link href="//maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css" rel="stylesheet">
+    <!--<link rel="stylesheet" href="js/vendor/fontawesome/css/font-awesome.min.css">-->
+    <!--<link rel="stylesheet" href="js/vendor/bootstrap/dist/css/bootstrap.min.css">-->
+</head>
+<body>
+
+<div id="application"></div>
+
+<!--templates-->
+<script type="text/template" id="layout-view-template">
+    <div id="nav"></div>
+    <div style="height: 48px" id="spacer"></div>
+    <div id="main-content" class="container"></div>
+
+    <footer></footer>
+</script>
+
+<script type="text/template" id="navigation-template">
+
+    <div class="container-fluid">
+        <div class="navbar-header">
+            <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <a class="navbar-brand" href="#">Time2Brew
+                <i class="fa fa-beer icon-white"></i>
+            </a>
+        </div>
+
+        <div class="collapse navbar-collapse">
+            <ul class="nav navbar-nav">
+                <li><a href="#status">Device Status</a></li>
+                <li><a href="#temperatureProfiles">Fermentation Profiles</a></li>
+                <li><a href="#equipmentProfiles">Equipment Profiles</a></li>
+                <li><a href="#device">Device</a></li>
+            </ul>
+        </div>
+    </div>
+
+</script>
+
+
+<script type="text/template" id="index-template">
+    <h1>Welcome</h1>
+    <h2>It's Time2Brew</h2>
+</script>
+
+<script type="text/template" id="status-template">
+    <div id="page-wrapper" class="container">
+
+        <div class="flex-container-col" style="width: 100%">
+
+            <div class="panel panel-default">
+                <div class="panel-heading  text-center">System Time</div>
+                <div class="panel-body  text-center">
+                    <h3 id="systemTime">{{systemTime}}</h3>
+                </div>
+            </div>
+
+            <ul class="flex-container-row">
+
+                <li class="flex1">
+                    <div class="panel panel-default">
+                        <div class="panel-heading  text-center">Left Probe</div>
+                        <div class="panel-body text-center">
+                            <h3 id="probe0Temp">{{probe0Temperature}}</h3>
+                        </div>
+                    </div>
+                </li>
+
+                <li class="flex1">
+                    <div class="panel panel-default">
+                        <div class="panel-heading  text-center">Right Probe</div>
+                        <div class="panel-body text-center">
+                            <h3 id="probe1Temp">{{probe1Temperature}}</h3>
+                        </div>
+                    </div>
+                </li>
+
+                <li class="flex1">
+                    <div class="panel panel-danger">
+                        <div class="panel-heading text-center">Heat Relay</div>
+                        <div class="panel-body text-center">
+                            <h3 id="heatRelayStatus">{{heatRelayOn}}</h3>
+                        </div>
+                    </div>
+                </li>
+
+                <li class="flex1">
+                    <div class="panel panel-info">
+                        <div class="panel-heading text-center">Cool Relay</div>
+                        <div class="panel-body text-center">
+                            <h3 id="coolRelayStatus">{{coolRelayOn}}</h3>
+                        </div>
+                    </div>
+                </li>
+            </ul>
+
+            <ul class="flex-container-row">
+                <li class="flex1">
+                    <div class="panel panel-default">
+                        <div class="panel-heading  text-center">Active Profile</div>
+                        <div class="panel-body  text-center">
+                            <h3 id="activeProfileName">{{activeProfile}}</h3>
+                        </div>
+                    </div>
+                </li>
+
+                <li class="flex1">
+                    <div class="panel panel-default">
+                        <div class="panel-heading  text-center">Active Profile Step</div>
+                        <div class="panel-body text-center">
+                            <h3 id="currentStepIndex">{{currentStepIndex}}</h3>
+                        </div>
+                    </div>
+                </li>
+
+                <li class="flex1">
+                    <div class="panel panel-default">
+                        <div class="panel-heading  text-center">Step Target Temperature</div>
+                        <div class="panel-body text-center">
+                            <h3 id="currentStepTemp">{{currentStepTemperature}}</h3>
+                        </div>
+                    </div>
+                </li>
+
+                <li class="flex1">
+                    <div class="panel panel-default">
+                        <div class="panel-heading  text-center">Step Time Remaining</div>
+                        <div class="panel-body text-center">
+                            <h3 id="currentStepTimeRemaining">{{currentStepRemainingSeconds}}</h3>
+                        </div>
+                    </div>
+                </li>
+
+            </ul>
+        </div>
+    </div>
+</script>
+
+<script type="text/template" id="tempProfilePage-layout-template">
+    <div id="profileListContainer" class="flex-item1"></div>
+    <div id="profileDetails" class="flex-item4"></div>
+</script>
+
+<script type="text/template" id="#temp-profile-list-group">
+    <div></div>
+</script>
+
+<script type="text/template" id="temp-profile-list-group-item">
+    <a href="#{{url}}">{{name}}</a>
+</script>
+
+<script type="text/template" id="profileTemplate">
+
+        <div class="col-md-3">
+            <h3>{{name}}:{{id}}</h3>
+
+            <ol>
+            {{#steps}}
+            <li>{{stepText}}</li>
+            {{/steps}}
+            </ol>
+
+            <a class="btn btn-primary" href="#">
+                View Runs <span class="glyphicon glyphicon-chevron-right"></span>
+            </a>
+        </div>
+
+        <div class="col-md-9">
+            <img class="img-responsive" src="http://placehold.it/700x300" alt="">
+        </div>
+
+</script>
+
+<script type="text/template" id="profilePanelTemplate">
+    <div class="panel panel-default">
+        <div class="panel-heading" role="tab">
+            <h4 class="panel-title">
+                <p id="profCol" data-toggle="collapse" data-parent="#accordion" data-target="#profile{{id}}">
+                    {{name}}
+                </p>
+            </h4>
+        </div>
+        <div id="profile{{id}}" class="panel-collapse collapse" role="tabpanel">
+            <div class="panel-body" id="{{bodyId}}">Some stuff here</div>
+        </div>
+    </div>
+</script>
+
+<script type="text/template" id="stepTemplate">
+    <div>{{startTemp}}-{{endTemp}}-{{duration}}-{{stepText}}</div>
+</script>
+
+<script type="text/template" id="equipProfiles-template">
+    <p>Equip profiles here</p>
+</script>
+
+<script type="text/template" id="device-template">
+    <p>Device here</p>
+</script>
+
+<script type="text/template" id="footer-template">
+    <div class="container">
+        <p class="text-muted">© 2015 Time2Brew, Inc.</p>
+    </div>
+</script>
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js"></script>
+<script>window.jQuery || document.write('<script src="js/vendor/jquery/dist/jquery.min.js">\x3C/script>')</script>
+
+<!--<script src="js/vendor/jquery/dist/jquery.min.js"></script>-->
+
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/js/bootstrap.min.js"></script>
+<!--<script src="js/vendor/bootstrap/dist/js/bootstrap.min.js"></script>-->
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/underscore.js/1.8.3/underscore-min.js"></script>
+<!--<script src="js/vendor/underscore/underscore-min.js"></script>-->
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/backbone.js/1.2.1/backbone-min.js"></script>
+<!--<script src="js/vendor/backbone/backbone.js"></script>-->
+
+<script src="js/vendor/marionette/lib/backbone.marionette.min.js"></script>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/rxjs/2.5.3/rx.lite.min.js"></script>
+<!--<script src="js/vendor/rxjs/dist/rx.lite.min.js"></script>-->
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/mustache.js/2.1.2/mustache.min.js"></script>
+<script src="js/vendor/mustache/mustache.min.js"></script>
+
+<!--apis-->
+<script src="../api/statusAPI.js"></script>
+<script src="../api/temperatureProfileAPI.js"></script>
+<script src="../api/equipmentProfileAPI.js"></script>
+<script src="../api/deviceAPI.js"></script>
+
+<!--models and collections-->
+<script src="status/status.model.js"></script>
+
+<script src="temperatureProfile/profileSteps.js"></script>
+<script src="temperatureProfile/tempProfile.js"></script>
+<script src="temperatureProfile/profileInstances.js"></script>
+
+<script src="equipmentProfile/equipmentProfiles.model.js"></script>
+<script src="equipmentProfile/equipmentProfileCollection.js"></script>
+
+<script src="device/device.model.js"></script>
+
+<!--views-->
+<script src="application/layout-view.js"></script>
+<script src="navigation/navigationView.js"></script>
+<script src="application/footer-view.js"></script>
+
+<script src="index/view.js"></script>
+<script src="device/view.js"></script>
+<script src="equipmentProfile/view.js"></script>
+<script src="status/view.js"></script>
+
+
+<!--routers-->
+<script src="index/router.js"></script>
+<script src="status/router.js"></script>
+
+<script src="../api/promisifyHttp.js"></script>
+<script src="js/utils.js"></script>
+<script src="application/application.js"></script>
+
+<script type="text/javascript">
+    Time2BrewApp.start();
+</script>
+
+
+</body>
+</html>
